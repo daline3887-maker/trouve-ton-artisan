@@ -16,6 +16,12 @@ const app = express();
 // ==========================================
 
 app.disable('x-powered-by');
+
+// Render utilise un proxy devant le serveur Node.js.
+// Cette configuration permet de récupérer correctement
+// l'adresse IP des visiteurs pour limiter les requêtes.
+app.set('trust proxy', 1);
+
 app.use(helmet());
 app.use(express.json({ limit: '20kb' }));
 
@@ -144,7 +150,7 @@ app.get('/api/artisans', async (req, res, next) => {
         .slice(0, 120)
         .replace(/[\\%_]/g, '\\$&');
 
-      clauses.push('a.nom LIKE ?');
+      clauses.push("a.nom LIKE ? ESCAPE '\\\\'");
       values.push('%' + search + '%');
     }
 
